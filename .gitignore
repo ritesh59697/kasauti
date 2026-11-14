@@ -6,3 +6,4 @@ contracts/broadcast/*/31337/
 web/dist/
 .vercel
 .DS_Store
+web/.env

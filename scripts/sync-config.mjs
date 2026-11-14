@@ -147,7 +147,10 @@ async function main() {
     unpricedExample: getAddress(tokens.find((t) => !stockFeeds.has(t.symbol.replace(/c$/, ""))).contract_address),
   };
   mkdirSync(new URL("../config", import.meta.url), { recursive: true });
-  writeFileSync(new URL("../config/base.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");
+  const json = JSON.stringify(out, null, 2) + "\n";
+  writeFileSync(new URL("../config/base.json", import.meta.url), json);
+  mkdirSync(new URL("../web/public", import.meta.url), { recursive: true });
+  writeFileSync(new URL("../web/public/config.json", import.meta.url), json); // served to the frontend
   console.log(`config/base.json: ${stocks.length} priced stocks, ${out.unpricedTokens} unpriced, quote ${quote.symbol} ${quote.address}`);
   for (const s of stocks) console.log(`  ${s.symbol.padEnd(7)} pools=${s.pools.length} top=${s.pools[0]?.address ?? "-"} mult=${s.multiplier}`);
 }
