@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "sync-config": "node --env-file=.env scripts/sync-config.mjs",
-    "test:contracts": "set -a && . ./.env && set +a && cd contracts && forge test"
+    "test:contracts": "set -a && . ./.env && set +a && cd contracts && forge test",
+    "export-abi": "cd contracts && forge build && cd .. && node scripts/export-abi.mjs"
   },
   "dependencies": {
     "viem": "2.21.54"

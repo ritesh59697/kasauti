@@ -61,6 +61,7 @@ async function main() {
   // 3. Factory allowlist from Aero's deployment file
   const aero = await getJson(env("AERO_CL_DEPLOYMENT_URL"));
   const clFactories = [getAddress(aero.clFactory)];
+  const quoter = getAddress(aero.metaquoter); // Aero's own quoter, used for previews only
 
   // 4. Quote token: resolved from pools (symbol from env), its USD feed from the directory
   const quoteSymbol = env("QUOTE_SYMBOL");
@@ -140,6 +141,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     oracleRegistry: registry,
     clFactories,
+    quoter,
     quote,
     stocks,
     totalTokensListed: tokens.length,

@@ -1,10 +1,11 @@
 {
   "chainId": 8453,
-  "generatedAt": "2026-11-14T16:52:08.517Z",
+  "generatedAt": "2026-11-15T14:15:32.625Z",
   "oracleRegistry": "0x3f3E8cf41cdd3b1D118c16471aB0113DfDDd5CaD",
   "clFactories": [
     "0x9CB220581b91b0C83223012FE69688b92aD07a76"
   ],
+  "quoter": "0x1dDfeC5058180C207F55BB77D95AcDd0d8227868",
   "quote": {
     "symbol": "USDC",
     "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
@@ -35,7 +36,7 @@
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
           "fee": 525,
-          "liquidityUsd": 228984
+          "liquidityUsd": 229930
         }
       ]
     },
@@ -58,7 +59,7 @@
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
           "fee": 281,
-          "liquidityUsd": 479639
+          "liquidityUsd": 516448
         }
       ]
     },
@@ -80,8 +81,8 @@
           "address": "0x16c70F04C3080a127486Cdf5a4C33c066bBF47C3",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 559,
-          "liquidityUsd": 1498690
+          "fee": 158,
+          "liquidityUsd": 1519972
         }
       ]
     },
@@ -103,8 +104,8 @@
           "address": "0x2836e062a3fe75943a7F4A552E2365b98E414E75",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 221,
-          "liquidityUsd": 1791780
+          "fee": 200,
+          "liquidityUsd": 1795079
         }
       ]
     },
@@ -126,8 +127,8 @@
           "address": "0x66DCd42E6314B287110922AE36cB2a8bdEECc153",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 296,
-          "liquidityUsd": 617533
+          "fee": 261,
+          "liquidityUsd": 591435
         }
       ]
     },
@@ -150,7 +151,7 @@
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
           "fee": 525,
-          "liquidityUsd": 220627
+          "liquidityUsd": 217030
         }
       ]
     },
@@ -172,8 +173,8 @@
           "address": "0xF668e21993f0ACd7ab00BB1cFbAeD0df28A3C8EC",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 519,
-          "liquidityUsd": 1441464
+          "fee": 399,
+          "liquidityUsd": 1424135
         }
       ]
     },
@@ -195,8 +196,8 @@
           "address": "0x880dB7Dda4407D99508574E680d067D1164B3cFE",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 265,
-          "liquidityUsd": 1031697
+          "fee": 292,
+          "liquidityUsd": 1034254
         }
       ]
     },
@@ -218,8 +219,8 @@
           "address": "0xd072410fa13D242e1d53721Bcf7AF02e3455DC96",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 213,
-          "liquidityUsd": 881785
+          "fee": 378,
+          "liquidityUsd": 887113
         }
       ]
     },
@@ -241,8 +242,8 @@
           "address": "0x2740C0faAb738F6e346e545fDE02aEF9B1A01ee7",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 362,
-          "liquidityUsd": 421489
+          "fee": 515,
+          "liquidityUsd": 591181
         }
       ]
     },
@@ -265,7 +266,7 @@
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
           "fee": 275,
-          "liquidityUsd": 503739
+          "liquidityUsd": 541854
         }
       ]
     },
@@ -287,8 +288,8 @@
           "address": "0x532e0F46d1e528507FC9454d5847C231f23bDDf6",
           "factory": "0x9CB220581b91b0C83223012FE69688b92aD07a76",
           "tickSpacing": 10,
-          "fee": 438,
-          "liquidityUsd": 1855554
+          "fee": 326,
+          "liquidityUsd": 1875069
         }
       ]
     }

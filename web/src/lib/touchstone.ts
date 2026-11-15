@@ -1,5 +1,6 @@
 import { createPublicClient, http, parseAbi, type Address } from "viem";
 import { base } from "viem/chains";
+import { env } from "./env";
 
 export type Pool = { address: Address; factory: Address; tickSpacing: number; fee: number; liquidityUsd: number };
 export type StockCfg = {
@@ -15,6 +16,8 @@ export type Config = {
   chainId: number;
   generatedAt: string;
   oracleRegistry: Address;
+  clFactories: Address[];
+  quoter: Address;
   quote: { symbol: string; address: Address; decimals: number; feed: { address: Address; decimals: number; heartbeat: number } };
   stocks: StockCfg[];
   totalTokensListed: number;
@@ -27,16 +30,15 @@ export type Row = {
   updatedAt: number; // unix seconds
   paused: boolean;
   multiplier: number;
+  quoteUsd: number;
   pools: { pool: Pool; priceUsd: number; gapBps: number }[];
 };
 
-const rpc = import.meta.env.VITE_BASE_RPC_URL as string | undefined;
-if (!rpc) throw new Error("VITE_BASE_RPC_URL is not set (see web/.env.example)");
 // All reads in a tick are folded into Multicall3 calls, which keeps public RPC rate limits happy.
 export const client = createPublicClient({
   chain: base,
   batch: { multicall: { wait: 16 } },
-  transport: http(rpc, { retryCount: 3 }),
+  transport: http(env.rpc, { retryCount: 3 }),
 });
 
 const feedAbi = parseAbi(["function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)"]);
@@ -44,6 +46,9 @@ const registryAbi = parseAbi(["function getOracleParams(address) view returns (u
 const poolAbi = parseAbi([
   "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16, uint16, uint16, bool)",
   "function token0() view returns (address)",
+]);
+const quoterAbi = parseAbi([
+  "function quoteExactInputSingleV3(address pool, address tokenIn, uint256 amountIn, uint160 sqrtPriceLimitX96) view returns (uint256 amountOut, uint160 sqrtPriceAfter, uint32 ticksCrossed)",
 ]);
 
 export async function loadConfig(): Promise<Config> {
@@ -80,9 +85,20 @@ export async function readBoard(cfg: Config): Promise<Row[]> {
           return { pool, priceUsd, gapBps: ((priceUsd - reference) / reference) * 10_000 };
         }),
       );
-      return { stock, reference, updatedAt: Number(updatedAt), paused, multiplier: Number(multWad) / 1e18, pools };
+      return { stock, reference, updatedAt: Number(updatedAt), paused, multiplier: Number(multWad) / 1e18, quoteUsd, pools };
     }),
   );
+}
+
+/** Expected output of an exact-input swap on one pool, from Aero's own quoter. Estimate only. */
+export async function quoteOut(cfg: Config, pool: Address, tokenIn: Address, amountIn: bigint): Promise<bigint> {
+  const [out] = await client.readContract({
+    address: cfg.quoter,
+    abi: quoterAbi,
+    functionName: "quoteExactInputSingleV3",
+    args: [pool, tokenIn, amountIn, 0n],
+  });
+  return out;
 }
 
 export function ageLabel(updatedAt: number, nowSec: number): string {
