@@ -7,3 +7,5 @@ web/dist/
 .vercel
 .DS_Store
 web/.env
+contracts/broadcast/**/dry-run/
+contracts/cache/

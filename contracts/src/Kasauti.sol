@@ -58,6 +58,16 @@ contract Kasauti {
         uint32 maxAge;
     }
 
+    /// @notice Initial wiring, applied in the constructor so a deploy is a single transaction.
+    struct Wiring {
+        address[] factories;
+        address quote;
+        address quoteFeed;
+        uint32 quoteMaxAge;
+        address[] stocks;
+        address[] feeds;
+    }
+
     uint256 private constant BPS = 10_000;
     uint160 private constant MIN_SQRT_RATIO_PLUS_ONE = 4295128740;
     uint160 private constant MAX_SQRT_RATIO_MINUS_ONE = 1461446703485210103287273052203988822378723970341;
@@ -108,10 +118,20 @@ contract Kasauti {
     error Reentrant();
     error TransferFailed();
 
-    constructor(IOracleRegistry registry_, address owner_) {
+    error WiringLength();
+
+    constructor(IOracleRegistry registry_, address owner_, Wiring memory w) {
         registry = registry_;
         owner = owner_;
         emit OwnerChanged(owner_);
+        if (w.stocks.length != w.feeds.length) revert WiringLength();
+        for (uint256 i; i < w.factories.length; i++) {
+            _setFactory(w.factories[i], true);
+        }
+        if (w.quote != address(0)) _setQuoteFeed(w.quote, w.quoteFeed, w.quoteMaxAge);
+        for (uint256 i; i < w.stocks.length; i++) {
+            _setStockFeed(w.stocks[i], w.feeds[i]);
+        }
     }
 
     modifier onlyOwner() {
@@ -122,23 +142,35 @@ contract Kasauti {
     // ---------------------------------------------------------------- admin (wiring only, no trade limits)
 
     function setStockFeed(address stock, address feed) external onlyOwner {
-        stockFeed[stock] = feed;
-        emit StockFeedSet(stock, feed);
+        _setStockFeed(stock, feed);
     }
 
     function setQuoteFeed(address quote, address feed, uint32 maxAge) external onlyOwner {
-        quoteFeed[quote] = QuoteFeed(feed, maxAge);
-        emit QuoteFeedSet(quote, feed, maxAge);
+        _setQuoteFeed(quote, feed, maxAge);
     }
 
     function setFactory(address factory, bool allowed) external onlyOwner {
-        allowedFactory[factory] = allowed;
-        emit FactorySet(factory, allowed);
+        _setFactory(factory, allowed);
     }
 
     function setOwner(address owner_) external onlyOwner {
         owner = owner_;
         emit OwnerChanged(owner_);
+    }
+
+    function _setStockFeed(address stock, address feed) private {
+        stockFeed[stock] = feed;
+        emit StockFeedSet(stock, feed);
+    }
+
+    function _setQuoteFeed(address quote, address feed, uint32 maxAge) private {
+        quoteFeed[quote] = QuoteFeed(feed, maxAge);
+        emit QuoteFeedSet(quote, feed, maxAge);
+    }
+
+    function _setFactory(address factory, bool allowed) private {
+        allowedFactory[factory] = allowed;
+        emit FactorySet(factory, allowed);
     }
 
     // ---------------------------------------------------------------- reads

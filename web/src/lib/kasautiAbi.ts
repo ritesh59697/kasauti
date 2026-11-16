@@ -12,6 +12,43 @@ export const kasautiAbi = [
         "name": "owner_",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "w",
+        "type": "tuple",
+        "internalType": "struct Kasauti.Wiring",
+        "components": [
+          {
+            "name": "factories",
+            "type": "address[]",
+            "internalType": "address[]"
+          },
+          {
+            "name": "quote",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "quoteFeed",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "quoteMaxAge",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "stocks",
+            "type": "address[]",
+            "internalType": "address[]"
+          },
+          {
+            "name": "feeds",
+            "type": "address[]",
+            "internalType": "address[]"
+          }
+        ]
       }
     ],
     "stateMutability": "nonpayable"
@@ -626,5 +663,10 @@ export const kasautiAbi = [
         "internalType": "address"
       }
     ]
+  },
+  {
+    "type": "error",
+    "name": "WiringLength",
+    "inputs": []
   }
 ] as const;

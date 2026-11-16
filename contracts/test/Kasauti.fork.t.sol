@@ -35,21 +35,24 @@ contract KasautiForkTest is Test {
         usdc = vm.parseJsonAddress(cfg, ".quote.address");
         unpriced = vm.parseJsonAddress(cfg, ".unpricedExample");
 
-        k = new Kasauti(IOracleRegistry(registry), address(this));
-        k.setFactory(factory, true);
-        k.setQuoteFeed(
-            usdc,
-            vm.parseJsonAddress(cfg, ".quote.feed.address"),
-            uint32(vm.parseJsonUint(cfg, ".quote.feed.heartbeat"))
-        );
+        uint256 n;
+        while (vm.keyExistsJson(cfg, string.concat(".stocks[", vm.toString(n), "]"))) n++;
+        Kasauti.Wiring memory w = Kasauti.Wiring({
+            factories: vm.parseJsonAddressArray(cfg, ".clFactories"),
+            quote: usdc,
+            quoteFeed: vm.parseJsonAddress(cfg, ".quote.feed.address"),
+            quoteMaxAge: uint32(vm.parseJsonUint(cfg, ".quote.feed.heartbeat")),
+            stocks: new address[](n),
+            feeds: new address[](n)
+        });
 
         uint256 bestLiq;
-        for (uint256 i;; i++) {
+        for (uint256 i; i < n; i++) {
             string memory p = string.concat(".stocks[", vm.toString(i), "]");
-            if (!vm.keyExistsJson(cfg, p)) break;
             address s = vm.parseJsonAddress(cfg, string.concat(p, ".address"));
             address f = vm.parseJsonAddress(cfg, string.concat(p, ".feed.address"));
-            k.setStockFeed(s, f);
+            w.stocks[i] = s;
+            w.feeds[i] = f;
             if (!vm.keyExistsJson(cfg, string.concat(p, ".pools[0]"))) continue;
             uint256 liq = vm.parseJsonUint(cfg, string.concat(p, ".pools[0].liquidityUsd"));
             if (liq > bestLiq) {
@@ -62,6 +65,7 @@ contract KasautiForkTest is Test {
                 otherStock = s;
             }
         }
+        k = new Kasauti(IOracleRegistry(registry), address(this), w);
         require(stock != address(0), "no priced stock with a pool in config");
 
         usdcUnit = 10 ** IERC20(usdc).decimals();
