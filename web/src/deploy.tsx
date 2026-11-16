@@ -124,7 +124,7 @@ function Deploy() {
 }
 
 const css = getComputedStyle(document.documentElement);
-const theme = darkTheme({ accentColor: css.getPropertyValue("--k-accent").trim(), accentColorForeground: css.getPropertyValue("--k-accent-fg").trim(), borderRadius: "small" });
+const theme = darkTheme({ accentColor: css.getPropertyValue("--k-primary").trim(), accentColorForeground: css.getPropertyValue("--k-primary-fg").trim(), borderRadius: "small" });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -15,7 +15,7 @@ const css = getComputedStyle(document.documentElement);
 const tok = (n: string) => css.getPropertyValue(n).trim();
 const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
 const base = prefersLight ? lightTheme : darkTheme;
-const rkTheme = base({ accentColor: tok("--k-accent"), accentColorForeground: tok("--k-accent-fg"), borderRadius: "small", fontStack: "system" });
+const rkTheme = base({ accentColor: tok("--k-primary"), accentColorForeground: tok("--k-primary-fg"), borderRadius: "small", fontStack: "system" });
 rkTheme.colors.modalBackground = tok("--k-surface");
 rkTheme.colors.connectButtonBackground = tok("--k-surface");
 rkTheme.colors.connectButtonText = tok("--k-text");

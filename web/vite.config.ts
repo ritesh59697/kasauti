@@ -16,6 +16,11 @@ function recordDeploy(rpc: string): Plugin {
     name: "kasauti-record-deploy",
     apply: "serve",
     configureServer(server) {
+      // mirror Vercel's cleanUrls in dev: /app serves app.html
+      server.middlewares.use((req, _res, next) => {
+        if (req.url === "/app" || req.url?.startsWith("/app?")) req.url = req.url.replace("/app", "/app.html");
+        next();
+      });
       server.middlewares.use("/__kasauti/record", (req, res) => {
         let body = "";
         req.on("data", (c) => (body += c));
@@ -71,5 +76,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss(), recordDeploy(env.VITE_BASE_RPC_URL)],
     resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+    // Only the landing and the app ship. deploy.html is local-only and stays out of the build.
+    build: { rollupOptions: { input: { index: path.resolve(__dirname, "index.html"), app: path.resolve(__dirname, "app.html") } } },
   };
 });

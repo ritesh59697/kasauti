@@ -13,14 +13,15 @@ import {
   type Address,
   type Hash,
 } from "viem";
-import { CircleAlert, CircleCheck, Clock, ExternalLink, Loader2, ShieldCheck, ShieldX } from "lucide-react";
+import { CircleAlert, Clock, ExternalLink, Loader2, ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StreakGauge } from "./StreakGauge";
+import { Touchstone } from "./Touchstone";
+import { Hallmark } from "./Brand";
 import { ageLabel, client, quoteOut, type Config, type Row } from "@/lib/touchstone";
 import { badForSide, judge, pct, usd, type Policy, type Side, type Verdict } from "@/lib/verdict";
 import { kasautiAbi } from "@/lib/kasautiAbi";
@@ -205,13 +206,17 @@ export function TradePanel({
   }
 
   const refused = preview?.verdict.kind === "refuse";
+  const stamp = preview ? stampText(preview.verdict) : undefined;
 
   return (
-    <section aria-labelledby="trade-h" className="rounded-lg border border-border bg-card p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 id="trade-h" className="font-heading text-lg">
-          {stock ? stock.symbol : "Pick a stock"}
-        </h2>
+    <section aria-labelledby="trade-h" className="rounded-2xl border border-border bg-card">
+      <div className="flex items-center justify-between gap-3 p-5">
+        <div className="grid">
+          <h2 id="trade-h" className="text-lg font-medium">
+            {stock ? stock.symbol : "Pick a stock"}
+          </h2>
+          {stock && <span className="text-xs text-muted-foreground">{stock.name.replace(/ \(.*\)$/, "")}</span>}
+        </div>
         <Tabs value={side} onValueChange={(v) => setSide(v as Side)}>
           <TabsList>
             <TabsTrigger value="buy">Buy</TabsTrigger>
@@ -220,113 +225,131 @@ export function TradePanel({
         </Tabs>
       </div>
 
-      <div className="grid gap-4">
-        <div className="grid gap-1.5">
+      <div className="grid gap-5 border-t border-border p-5">
+        <div className="grid gap-2">
           <div className="flex items-baseline justify-between">
-            <Label htmlFor="amt">You pay ({inSym})</Label>
+            <Label htmlFor="amt">You pay</Label>
             {balance.data !== undefined && (
-              <button type="button" className="num text-xs text-muted-foreground underline-offset-2 hover:underline" onClick={() => setAmountStr(formatUnits(balance.data!, inDec))}>
+              <button type="button" className="num rounded-sm text-xs text-muted-foreground underline-offset-2 hover:underline" onClick={() => setAmountStr(formatUnits(balance.data!, inDec))}>
                 Balance {Number(formatUnits(balance.data, inDec)).toLocaleString("en-US", { maximumFractionDigits: 6 })}
               </button>
             )}
           </div>
-          <Input id="amt" inputMode="decimal" value={amountStr} onChange={(e) => setAmountStr(e.target.value.replace(/[^0-9.]/g, ""))} className="num h-11 text-lg" />
+          <div className="relative">
+            <Input id="amt" inputMode="decimal" value={amountStr} onChange={(e) => setAmountStr(e.target.value.replace(/[^0-9.]/g, ""))} className="num h-12 pr-20 text-lg" />
+            <span className="num pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">{inSym}</span>
+          </div>
         </div>
 
-        <fieldset className="grid gap-1.5">
-          <legend className="mb-1.5 text-sm font-medium">Refuse if the fill is worse than the touchstone by more than</legend>
+        <fieldset className="grid gap-2">
+          <legend className="mb-2 text-sm font-medium">Refuse beyond this gap from the touchstone</legend>
           <div className="flex flex-wrap items-center gap-2">
             {BAND_PRESETS.map((b) => (
-              <Button key={b} type="button" size="sm" variant={bandBps === b ? "default" : "secondary"} onClick={() => setBandBps(b)} aria-pressed={bandBps === b}>
+              <Button
+                key={b}
+                type="button"
+                variant="ghost"
+                onClick={() => setBandBps(b)}
+                aria-pressed={bandBps === b}
+                className={cn("num h-8 border px-3", bandBps === b ? "border-[var(--k-border-strong)] bg-surface-2 text-foreground" : "border-border text-secondary-text")}
+              >
                 {(b / 100).toFixed(2)}%
               </Button>
             ))}
-            <div className="flex items-center gap-1">
-              <Input aria-label="Custom band in basis points" inputMode="numeric" value={bandBps} onChange={(e) => setBandBps(Math.min(10_000, Number(e.target.value.replace(/\D/g, "")) || 0))} className="num h-8 w-20" />
+            <div className="ml-auto flex items-center gap-2">
+              <Input aria-label="Custom band in basis points" inputMode="numeric" value={bandBps} onChange={(e) => setBandBps(Math.min(10_000, Number(e.target.value.replace(/\D/g, "")) || 0))} className="num h-8 w-20 text-right" />
               <span className="text-xs text-muted-foreground">bps</span>
             </div>
           </div>
         </fieldset>
+      </div>
 
-        <div className="grid gap-3 rounded-md border border-border p-3">
+      <div className="grid gap-3 border-t border-border p-5">
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="age" className="font-normal text-secondary-text">
+            Treat the touchstone as frozen after
+          </Label>
+          <div className="flex items-center gap-2">
+            <Input id="age" inputMode="numeric" value={maxAgeMin} onChange={(e) => setMaxAgeMin(Number(e.target.value.replace(/\D/g, "")) || 0)} className="num h-8 w-20 text-right" />
+            <span className="w-6 text-xs text-muted-foreground">min</span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="closed" className="font-normal text-secondary-text">
+            Allow trading on a frozen touchstone
+          </Label>
+          <Switch id="closed" checked={allowClosed} onCheckedChange={setAllowClosed} />
+        </div>
+        {allowClosed && (
           <div className="flex items-center justify-between gap-3">
-            <Label htmlFor="age" className="text-sm font-normal">
-              Treat the touchstone as frozen after
+            <Label htmlFor="cband" className="font-normal text-secondary-text">
+              Band while frozen
             </Label>
-            <div className="flex items-center gap-1">
-              <Input id="age" inputMode="numeric" value={maxAgeMin} onChange={(e) => setMaxAgeMin(Number(e.target.value.replace(/\D/g, "")) || 0)} className="num h-8 w-20" />
-              <span className="text-xs text-muted-foreground">min</span>
+            <div className="flex items-center gap-2">
+              <Input id="cband" inputMode="numeric" value={closedBandBps} onChange={(e) => setClosedBandBps(Math.min(10_000, Number(e.target.value.replace(/\D/g, "")) || 0))} className="num h-8 w-20 text-right" />
+              <span className="w-6 text-xs text-muted-foreground">bps</span>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            <Label htmlFor="closed" className="text-sm font-normal">
-              Allow trading on a frozen touchstone
-            </Label>
-            <Switch id="closed" checked={allowClosed} onCheckedChange={setAllowClosed} />
-          </div>
-          {allowClosed && (
-            <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="cband" className="text-sm font-normal text-muted-foreground">
-                Band while frozen
-              </Label>
-              <div className="flex items-center gap-1">
-                <Input id="cband" inputMode="numeric" value={closedBandBps} onChange={(e) => setClosedBandBps(Math.min(10_000, Number(e.target.value.replace(/\D/g, "")) || 0))} className="num h-8 w-20" />
-                <span className="text-xs text-muted-foreground">bps</span>
+        )}
+      </div>
+
+      {/* preview: the moment */}
+      <div className="grid gap-4 border-t border-border bg-deep p-5" aria-live="polite">
+        {!row || !pool ? (
+          <p className="text-sm text-muted-foreground">Pick a stock with a pool from the board</p>
+        ) : quote.isError ? (
+          <p className="text-sm text-refuse">Aero could not quote this size</p>
+        ) : !preview ? (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="animate-spin" size={16} aria-hidden /> Quoting on Aero…
+          </p>
+        ) : (
+          <>
+            <dl className="grid grid-cols-3 gap-4">
+              <div className="grid gap-1">
+                <dt className="text-xs text-muted-foreground">Touchstone</dt>
+                <dd className="num text-base text-gold">{usd(row.reference)}</dd>
+                <dd className="num text-xs text-muted-foreground">{ageLabel(row.updatedAt, now)} old</dd>
               </div>
+              <div className="grid gap-1">
+                <dt className="text-xs text-muted-foreground">Expected fill</dt>
+                <dd className="num text-base">{usd(preview.price)}</dd>
+                <dd className="num truncate text-xs text-muted-foreground">
+                  {preview.outAmt.toLocaleString("en-US", { maximumFractionDigits: 6 })} {outSym}
+                </dd>
+              </div>
+              <div className="grid gap-1 text-right">
+                <dt className="text-xs text-muted-foreground">Gap</dt>
+                <dd className={cn("num text-base", badForSide(side, preview.verdict.gapBps, preview.verdict.bandBps) ? "text-refuse" : "text-foreground")}>{pct(preview.verdict.gapBps)}</dd>
+                <dd className="text-xs text-muted-foreground">Aero quote</dd>
+              </div>
+            </dl>
+            <Touchstone
+              variant="trade"
+              title={`Expected fill ${pct(preview.verdict.gapBps)} against the touchstone; refused beyond ${pct(side === "buy" ? preview.verdict.bandBps : -preview.verdict.bandBps)}`}
+              rows={[{ key: "fill", label: stock?.symbol ?? "", gapBps: preview.verdict.gapBps, bad: refused }]}
+              bandBps={preview.verdict.bandBps}
+              side={side}
+              reference={`touchstone ${usd(row.reference)}`}
+            />
+            <div className="grid gap-3">
+              {stamp && <Hallmark kind={refused ? "refuse" : "fill"} className="justify-self-start">{stamp}</Hallmark>}
+              <p className="text-sm text-secondary-text">{verdictText(preview.verdict, preview.ageSec)}</p>
             </div>
-          )}
-        </div>
+          </>
+        )}
+      </div>
 
-        {/* preview */}
-        <div className="grid gap-3 rounded-md bg-surface-2 p-4" aria-live="polite">
-          {!row || !pool ? (
-            <p className="text-sm text-muted-foreground">Pick a stock with a pool from the board.</p>
-          ) : quote.isError ? (
-            <p className="text-sm text-refuse">Could not get a quote from Aero for this size.</p>
-          ) : !preview ? (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="animate-spin" size={14} aria-hidden /> Quoting on Aero…
-            </p>
-          ) : (
-            <>
-              <dl className="grid grid-cols-3 gap-3 text-sm">
-                <div>
-                  <dt className="text-xs text-muted-foreground">Touchstone</dt>
-                  <dd className="num">{usd(row.reference)}</dd>
-                  <dd className="num text-xs text-muted-foreground">{ageLabel(row.updatedAt, now)} old</dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-muted-foreground">Expected fill</dt>
-                  <dd className="num">{usd(preview.price)}</dd>
-                  <dd className="num text-xs text-muted-foreground">
-                    {preview.outAmt.toLocaleString("en-US", { maximumFractionDigits: 6 })} {outSym}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-muted-foreground">Gap</dt>
-                  <dd className={cn("num", badForSide(side, preview.verdict.gapBps, preview.verdict.bandBps) ? "text-refuse" : "text-fill")}>{pct(preview.verdict.gapBps)}</dd>
-                  <dd className="text-xs text-muted-foreground">est. by Aero quoter</dd>
-                </div>
-              </dl>
-              <StreakGauge side={side} gapBps={preview.verdict.gapBps} bandBps={preview.verdict.bandBps} refused={refused} />
-              <p className={cn("flex items-start gap-2 text-sm", refused ? "text-refuse" : "text-fill")}>
-                {refused ? <ShieldX size={16} className="mt-0.5 shrink-0" aria-hidden /> : <ShieldCheck size={16} className="mt-0.5 shrink-0" aria-hidden />}
-                {verdictText(preview.verdict, preview.ageSec)}
-              </p>
-            </>
-          )}
-        </div>
-
+      <div className="grid gap-4 border-t border-border p-5">
         {/* eligibility: the contest excludes trading for U.S. users, and Coinbase stock tokens are for non-U.S. persons */}
-        <label htmlFor="elig" className="flex items-start gap-3 rounded-md border border-border p-3 text-xs text-muted-foreground">
+        <label htmlFor="elig" className="flex cursor-pointer items-start gap-3 text-xs text-muted-foreground">
           <Checkbox id="elig" checked={eligible} onCheckedChange={(v) => setEligible(v === true)} className="mt-0.5" />
           <span>
-            I am not a U.S. person, not in a sanctioned region, and allowed to hold tokenized stocks where I live. I understand
-            prices can move and Kasauti is a tool, not advice.
+            I am not a U.S. person, not in a sanctioned region, and allowed to hold tokenized stocks where I live. I understand prices
+            can move and Kasauti is a tool, not advice.
           </span>
         </label>
 
-        {/* actions */}
         <div className="grid gap-2">
           {!env.kasauti ? (
             <Button disabled variant="secondary" className="h-11">
@@ -361,7 +384,7 @@ export function TradePanel({
               <Button disabled variant="secondary" className="h-11">
                 <ShieldX size={16} aria-hidden /> Kasauti will refuse this trade
               </Button>
-              <Button variant="secondary" onClick={() => trade(true)} disabled={signing || !preview}>
+              <Button variant="ghost" className="h-9 text-secondary-text" onClick={() => trade(true)} disabled={signing || !preview}>
                 Send anyway and record the refusal onchain
               </Button>
             </>
@@ -381,6 +404,13 @@ export function TradePanel({
       </div>
     </section>
   );
+}
+
+function stampText(v: Verdict): string {
+  if (v.kind === "fill") return `Fills ${pct(v.gapBps)}`;
+  if (v.reason === "stale") return "Refused · frozen";
+  if (v.reason === "paused") return "Refused · paused";
+  return `Refused ${pct(v.gapBps)}`;
 }
 
 function Receipt({ hash, args, row, side }: { hash: Hash; args?: readonly unknown[]; row: Row; side: Side }) {
@@ -409,15 +439,15 @@ function Receipt({ hash, args, row, side }: { hash: Hash; args?: readonly unknow
             const a = r.data.args ?? [];
             switch (r.data.errorName) {
               case "AboveTouchstone":
-                return `Refused onchain: AboveTouchstone, ${pct(Number(a[0]))} above the touchstone.`;
+                return `AboveTouchstone: you would have paid ${pct(Number(a[0]))} over the touchstone.`;
               case "BelowTouchstone":
-                return `Refused onchain: BelowTouchstone, ${pct(-Number(a[0]))} below the touchstone.`;
+                return `BelowTouchstone: you would have received ${pct(-Number(a[0]))} under the touchstone.`;
               case "StaleTouchstone":
-                return `Refused onchain: StaleTouchstone, reference ${ageLabel(0, Number(a[1]))} old.`;
+                return `StaleTouchstone: the reference was ${ageLabel(0, Number(a[1]))} old.`;
               case "TouchstonePaused":
-                return "Refused onchain: TouchstonePaused.";
+                return "TouchstonePaused: Coinbase has paused this stock's reference.";
               default:
-                return `Refused onchain: ${r.data.errorName}.`;
+                return `${r.data.errorName}.`;
             }
           }
         }
@@ -440,26 +470,34 @@ function Receipt({ hash, args, row, side }: { hash: Hash; args?: readonly unknow
 
   const link = `${env.explorer}/tx/${hash}`;
   return (
-    <div className="grid gap-2 rounded-md border border-border p-4 text-sm" aria-live="polite">
+    <div className="grid gap-3 rounded-xl border border-border p-4 text-sm" aria-live="polite">
       {rcpt.isLoading && (
         <p className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="animate-spin" size={14} aria-hidden /> Waiting for Base…
+          <Loader2 className="animate-spin" size={16} aria-hidden /> Waiting for Base…
         </p>
       )}
       {rcpt.data?.status === "success" && fill && (
-        <p className="flex items-start gap-2 text-fill">
-          <CircleCheck size={16} className="mt-0.5 shrink-0" aria-hidden />
-          Filled {side === "buy" ? "buy" : "sell"} of {row.stock.symbol} at {usd(Number(fill.realizedE18) / 1e18)} vs touchstone{" "}
-          {usd(Number(fill.referenceE18) / 1e18)} ({pct(Number(fill.gapBps))}){fill.closedMarket ? ", frozen-price band" : ""}.
-        </p>
+        <>
+          <Hallmark kind="fill" className="justify-self-start">
+            Filled {pct(Number(fill.gapBps))}
+          </Hallmark>
+          <p className="text-secondary-text">
+            {side === "buy" ? "Bought" : "Sold"} {row.stock.symbol} at {usd(Number(fill.realizedE18) / 1e18)} against a touchstone of{" "}
+            {usd(Number(fill.referenceE18) / 1e18)}
+            {fill.closedMarket ? ", on the frozen-price band" : ""}.
+          </p>
+        </>
       )}
       {rcpt.data?.status === "reverted" && (
-        <p className="flex items-start gap-2 text-refuse">
-          <ShieldX size={16} className="mt-0.5 shrink-0" aria-hidden /> {reason.data ?? "Refused onchain. Reading the reason…"}
-        </p>
+        <>
+          <Hallmark kind="refuse" className="justify-self-start">
+            Refused onchain
+          </Hallmark>
+          <p className="text-secondary-text">{reason.data ?? "Reading the reason…"}</p>
+        </>
       )}
-      <a className="inline-flex items-center gap-1 text-muted-foreground underline underline-offset-2" href={link} target="_blank" rel="noreferrer">
-        View on Basescan <ExternalLink size={12} aria-hidden />
+      <a className="inline-flex items-center gap-1.5 justify-self-start rounded-sm text-muted-foreground underline-offset-2 hover:underline" href={link} target="_blank" rel="noreferrer">
+        View on Basescan <ExternalLink size={14} aria-hidden />
       </a>
     </div>
   );

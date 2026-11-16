@@ -9,29 +9,36 @@
 @import "@fontsource/ibm-plex-mono/500.css";
 
 /*
-  Kasauti tokens. Dark-first: the touchstone is a black stone, the streak is gold.
-  Dials: VARIANCE 4 · MOTION 3 · DENSITY 6.
-  References: CoW Swap (compact trade card, segmented Buy/Sell, one primary action),
-  Robinhood stock page (near-black canvas, big tabular numbers, one accent).
+  Kasauti tokens. Direction: an assayer's bench. Quiet graphite chrome; gold appears only as the
+  touchstone's reference streak. Character: exact, unhurried, a little old-world.
+  Signature: verdicts stamped like hallmarks. Moment: the touchstone drawn from live data.
 */
 :root {
   color-scheme: dark;
-  --k-bg: #12110e;
-  --k-surface: #1b1a16;
-  --k-surface-2: #23211c;
-  --k-border: #2e2b24;
-  --k-text: #ece6d8;
-  --k-muted: #9a9384;
-  --k-accent: #d4ae4f; /* the gold streak */
-  --k-accent-fg: #17140b;
-  --k-refuse: #e0795a;
-  --k-fill: #7fc79a;
+  --k-deep: #0f0f10;
+  --k-bg: #141415;
+  --k-surface: #19191b;
+  --k-surface-2: #232325;
+  --k-text: #ededed;
+  --k-text-2: #a1a1a6;
+  --k-muted: #85858b;
+  --k-border: rgb(237 237 237 / 0.08);
+  --k-border-strong: rgb(237 237 237 / 0.14);
+  --k-primary: #ededed; /* off-white primary action on dark */
+  --k-primary-fg: #141415;
+  --k-gold: #d4ae4f; /* the streak; reserved for the reference price */
+  --k-gold-ink: #d4ae4f;
+  --k-fill: #4cc38a;
+  --k-refuse: #e5484d;
+  --k-stone-hi: #2a2a2d;
+  --k-stone-lo: #0b0b0c;
 
-  --k-radius: 6px;
+  --k-radius: 8px;
   --k-unit: 4px;
-  --k-fast: 120ms;
-  --k-base: 200ms;
-  --k-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --k-fast: 150ms;
+  --k-base: 220ms;
+  --k-enter: 400ms;
+  --k-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* shadcn mapping */
   --background: var(--k-bg);
@@ -40,8 +47,8 @@
   --card-foreground: var(--k-text);
   --popover: var(--k-surface-2);
   --popover-foreground: var(--k-text);
-  --primary: var(--k-accent);
-  --primary-foreground: var(--k-accent-fg);
+  --primary: var(--k-primary);
+  --primary-foreground: var(--k-primary-fg);
   --secondary: var(--k-surface-2);
   --secondary-foreground: var(--k-text);
   --muted: var(--k-surface-2);
@@ -50,24 +57,29 @@
   --accent-foreground: var(--k-text);
   --destructive: var(--k-refuse);
   --border: var(--k-border);
-  --input: var(--k-border);
-  --ring: var(--k-accent);
+  --input: var(--k-border-strong);
+  --ring: var(--k-text-2);
   --radius: var(--k-radius);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     color-scheme: light;
-    --k-bg: #f5f1e8;
-    --k-surface: #fffdf8;
-    --k-surface-2: #efe9dc;
-    --k-border: #ddd5c4;
-    --k-text: #1d1b16;
-    --k-muted: #6b655a;
-    --k-accent: #8a6a12;
-    --k-accent-fg: #fffaf0;
-    --k-refuse: #b4472b;
-    --k-fill: #2f7a4a;
+    --k-deep: #f4f4f5;
+    --k-bg: #fafafa;
+    --k-surface: #ffffff;
+    --k-surface-2: #f4f4f5;
+    --k-text: #171717;
+    --k-text-2: #525252;
+    --k-muted: #6e6e73;
+    --k-border: rgb(23 23 23 / 0.08);
+    --k-border-strong: rgb(23 23 23 / 0.14);
+    --k-primary: #171717;
+    --k-primary-fg: #ffffff;
+    --k-gold: #d4ae4f; /* on the black stone it stays bright */
+    --k-gold-ink: #8a6a12; /* gold used as text on a light page */
+    --k-fill: #16a34a;
+    --k-refuse: #dc2626;
   }
 }
 
@@ -94,25 +106,38 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-gold: var(--k-accent);
+  --color-gold: var(--k-gold-ink);
   --color-refuse: var(--k-refuse);
   --color-fill: var(--k-fill);
   --color-surface-2: var(--k-surface-2);
+  --color-deep: var(--k-deep);
+  --color-secondary-text: var(--k-text-2);
+  --color-hairline: var(--k-border);
 
+  /* nested radius: tags 4, controls 8, cards 12, panels 16 */
   --radius-sm: calc(var(--radius) / 2);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) * 2);
-  --radius-xl: calc(var(--radius) * 2);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
 
   --spacing: var(--k-unit);
 
-  /* type scale, 6 steps */
+  /* type scale */
   --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
   --text-xl: 1.75rem;
+  --text-xl--line-height: 1.15;
   --text-2xl: 2.5rem;
+  --text-2xl--line-height: 1.08;
+  --text-3xl: 4rem;
+  --text-3xl--line-height: 1.04;
 
   --ease-k: var(--k-ease);
 }
@@ -132,13 +157,44 @@
     font-variant-numeric: tabular-nums;
   }
   :focus-visible {
-    outline: 2px solid var(--k-accent);
+    outline: 2px solid var(--k-text-2);
     outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
     * {
       transition-duration: 0ms !important;
       animation-duration: 0ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* the signature: a verdict stamped like a hallmark, double-ruled */
+  .hallmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 8px;
+    border: 1px solid currentColor;
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .rise {
+    animation: k-rise var(--k-enter) var(--k-ease) both;
+  }
+  @keyframes k-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
     }
   }
 }

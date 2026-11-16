@@ -1,7 +1,6 @@
-import { ArrowDownRight, ArrowUpRight, PauseCircle } from "lucide-react";
+import { PauseCircle } from "lucide-react";
 import { ageLabel, type Row } from "@/lib/touchstone";
 import { badForSide, pct, usd, type Side } from "@/lib/verdict";
-import { env } from "@/lib/env";
 import { cn } from "@/lib/utils";
 
 export function Board({
@@ -20,16 +19,16 @@ export function Board({
   onSelect: (address: string) => void;
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-hidden rounded-xl border border-border bg-card">
       <table className="w-full border-collapse text-sm">
         <caption className="sr-only">Tokenized stocks with a Chainlink touchstone, and the gap to their Aero pool price</caption>
         <thead>
           <tr className="text-left text-xs text-muted-foreground">
-            <th className="py-2 pr-3 font-medium">Stock</th>
-            <th className="py-2 px-3 text-right font-medium">Touchstone</th>
-            <th className="py-2 px-3 text-right font-medium">Age</th>
-            <th className="py-2 px-3 text-right font-medium max-sm:hidden">Pool</th>
-            <th className="py-2 pl-3 text-right font-medium">Gap</th>
+            <th className="h-10 pl-4 font-normal">Stock</th>
+            <th className="h-10 px-3 text-right font-normal">Touchstone</th>
+            <th className="h-10 px-3 text-right font-normal max-sm:hidden">Age</th>
+            <th className="h-10 px-3 text-right font-normal max-md:hidden">Pool</th>
+            <th className="h-10 pr-4 pl-3 text-right font-normal">Gap</th>
           </tr>
         </thead>
         <tbody>
@@ -42,11 +41,11 @@ export function Board({
                 key={r.stock.address}
                 onClick={() => onSelect(r.stock.address)}
                 className={cn(
-                  "cursor-pointer border-t border-border transition-colors duration-[var(--k-fast)] hover:bg-surface-2/60",
-                  isSel && "bg-surface-2",
+                  "h-14 cursor-pointer border-t border-border transition-colors duration-150",
+                  isSel ? "bg-surface-2 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)]" : "hover:bg-surface-2/50",
                 )}
               >
-                <td className={cn("py-2.5 pr-3", isSel && "shadow-[inset_3px_0_0_var(--k-accent)]")}>
+                <td className="pl-4">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -54,44 +53,30 @@ export function Board({
                       onSelect(r.stock.address);
                     }}
                     aria-pressed={isSel}
-                    className="rounded-sm pl-3 text-left font-medium"
+                    className="grid rounded-sm text-left"
                   >
-                    {r.stock.symbol}
-                    <span className="block text-xs font-normal text-muted-foreground">{r.stock.name.replace(/ \(.*\)$/, "")}</span>
+                    <span className="font-medium">{r.stock.symbol}</span>
+                    <span className="text-xs text-muted-foreground">{r.stock.name.replace(/ \(.*\)$/, "")}</span>
                   </button>
                 </td>
-                <td className="num py-2.5 px-3 text-right">
-                  {usd(r.reference)}
+                <td className="num px-3 text-right">
                   {r.paused && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-xs text-refuse">
-                      <PauseCircle size={12} aria-hidden /> paused
+                    <span className="mr-2 inline-flex items-center gap-1 text-xs text-refuse">
+                      <PauseCircle size={14} aria-hidden /> paused
                     </span>
                   )}
+                  {usd(r.reference)}
                 </td>
-                <td className="num py-2.5 px-3 text-right text-muted-foreground">{ageLabel(r.updatedAt, now)}</td>
-                <td className="num py-2.5 px-3 text-right max-sm:hidden">{top ? usd(top.priceUsd) : "no pool"}</td>
-                <td className={cn("num py-2.5 pl-3 text-right", bad ? "text-refuse" : "text-foreground")}>
-                  {top ? (
-                    <span className="inline-flex items-center gap-1">
-                      {top.gapBps >= 0 ? <ArrowUpRight size={14} aria-hidden /> : <ArrowDownRight size={14} aria-hidden />}
-                      {pct(top.gapBps)}
-                    </span>
-                  ) : (
-                    "—"
-                  )}
-                </td>
+                <td className="num px-3 text-right text-muted-foreground max-sm:hidden">{ageLabel(r.updatedAt, now)}</td>
+                <td className="num px-3 text-right text-secondary-text max-md:hidden">{top ? usd(top.priceUsd) : "no pool"}</td>
+                <td className={cn("num pr-4 pl-3 text-right", bad ? "text-refuse" : "text-foreground")}>{top ? pct(top.gapBps) : "—"}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Gap in <span className="text-refuse">this colour</span> means Kasauti would refuse a {side} at your band. Pools are Aero
-        CL pools checked against{" "}
-        <a className="underline underline-offset-2" href={`${env.explorer}/address/${rows[0]?.pools[0]?.pool.factory ?? ""}`} target="_blank" rel="noreferrer">
-          Aero's factory
-        </a>
-        .
+      <p className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
+        A gap in <span className="text-refuse">red</span> is one Kasauti would refuse for a {side} at your {(bandBps / 100).toFixed(2)}% band
       </p>
     </div>
   );
