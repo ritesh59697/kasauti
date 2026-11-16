@@ -170,10 +170,10 @@ export function Landing() {
               </p>
             </div>
             <div className="grid content-center gap-2 lg:justify-self-end">
-              <span className="num text-[4rem] leading-none font-medium text-refuse sm:text-[5rem]">−8.40%</span>
-              <span className="text-secondary-text">MSTRc's Aero pool against its frozen reference, Sunday 15 November 2026</span>
-              <span className="mt-4">
-                <Hallmark kind="refuse">Sell refused −8.40%</Hallmark>
+              <span className="num text-[4rem] leading-none font-medium text-refuse sm:text-[5rem]">−6.40%</span>
+              <span className="text-secondary-text">MSTRc's Aero pool against its frozen reference, Saturday 14 November 2026, 22:20 IST</span>
+              <span className="mt-2 max-w-[36ch] text-sm text-muted-foreground">
+                At any band tighter than that gap, Kasauti would have refused the sell.
               </span>
             </div>
           </div>
@@ -208,8 +208,8 @@ export function Landing() {
                   ],
                   ["Tests", "15 tests against a Base mainnet fork, including a fuzzed check that a buy fills inside the band or not at all"],
                   ["Coverage", cfg ? `${cfg.stocks.length} of ${cfg.totalTokensListed} Coinbase stock tokens have a reference feed. Kasauti refuses the rest` : "Reading…"],
-                  ["Fees and custody", "No fee. It holds your tokens only inside the transaction"],
-                  ["Owner powers", "Wiring only: which feeds and pool factory count. No pause switch and no trade limits"],
+                  ["Custody", "It holds your tokens only inside the transaction"],
+                  ["Owner powers", "The owner can change which feeds and pool factory count. No fee and no trade limits"],
                 ] as const
               ).map(([k, v]) => (
                 <div key={k} className="grid gap-1 border-b border-border py-4 sm:grid-cols-[200px_1fr] sm:gap-8">
