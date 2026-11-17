@@ -3,6 +3,7 @@ import { ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Hallmark, Wordmark } from "@/components/Brand";
 import { Touchstone } from "@/components/Touchstone";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadConfig, readBoard, type Config, type Row } from "@/lib/touchstone";
 import { env } from "@/lib/env";
 
@@ -59,6 +60,7 @@ export function Landing() {
           <a href="#contract" className="text-secondary-text transition-colors duration-150 hover:text-foreground max-sm:hidden">
             Contract
           </a>
+          <ThemeToggle />
           <Button asChild size="lg" className="px-4">
             <a href={APP}>Open the app</a>
           </Button>

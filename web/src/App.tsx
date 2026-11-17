@@ -4,6 +4,7 @@ import { ExternalLink, Loader2 } from "lucide-react";
 import { Board } from "@/components/Board";
 import { TradePanel } from "@/components/TradePanel";
 import { Wordmark } from "@/components/Brand";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadConfig, readBoard, type Config, type Row } from "@/lib/touchstone";
 import type { Side } from "@/lib/verdict";
 import { env } from "@/lib/env";
@@ -72,7 +73,10 @@ export default function App() {
               )}
             </nav>
           </div>
-          <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
+          <div className="flex items-center gap-3">
+            <ThemeToggle className="max-sm:hidden" />
+            <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
+          </div>
         </div>
       </header>
 

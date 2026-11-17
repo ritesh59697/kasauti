@@ -19,7 +19,7 @@ export function Board({
   onSelect: (address: string) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--k-card-shadow)]">
       <table className="w-full border-collapse text-sm">
         <caption className="sr-only">Tokenized stocks with a Chainlink touchstone, and the gap to their Aero pool price</caption>
         <thead>

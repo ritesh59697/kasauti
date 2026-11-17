@@ -30,6 +30,7 @@
   --k-gold-ink: #d4ae4f;
   --k-fill: #4cc38a;
   --k-refuse: #e5484d;
+  --k-card-shadow: 0 0 0 0 transparent; /* dark: depth from surface steps */
   --k-stone-hi: #2a2a2d;
   --k-stone-lo: #0b0b0c;
 
@@ -62,8 +63,9 @@
   --radius: var(--k-radius);
 }
 
+/* light: follows the system unless the viewer picked a theme (data-theme on <html>) */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme="dark"]) {
     color-scheme: light;
     --k-deep: #f4f4f5;
     --k-bg: #fafafa;
@@ -80,7 +82,28 @@
     --k-gold-ink: #8a6a12; /* gold used as text on a light page */
     --k-fill: #16a34a;
     --k-refuse: #dc2626;
+    --k-card-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
   }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --k-deep: #f4f4f5;
+  --k-bg: #fafafa;
+  --k-surface: #ffffff;
+  --k-surface-2: #f4f4f5;
+  --k-text: #171717;
+  --k-text-2: #525252;
+  --k-muted: #6e6e73;
+  --k-border: rgb(23 23 23 / 0.08);
+  --k-border-strong: rgb(23 23 23 / 0.14);
+  --k-primary: #171717;
+  --k-primary-fg: #ffffff;
+  --k-gold: #d4ae4f; /* on the black stone it stays bright */
+  --k-gold-ink: #8a6a12; /* gold used as text on a light page */
+  --k-fill: #16a34a;
+  --k-refuse: #dc2626;
+  --k-card-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
 }
 
 @theme inline {

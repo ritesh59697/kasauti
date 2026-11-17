@@ -209,7 +209,7 @@ export function TradePanel({
   const stamp = preview ? stampText(preview.verdict) : undefined;
 
   return (
-    <section aria-labelledby="trade-h" className="rounded-2xl border border-border bg-card">
+    <section aria-labelledby="trade-h" className="rounded-2xl border border-border bg-card shadow-[var(--k-card-shadow)]">
       <div className="flex items-center justify-between gap-3 p-5">
         <div className="grid">
           <h2 id="trade-h" className="text-lg font-medium">
