@@ -76,8 +76,8 @@ export function Landing() {
             </h1>
             <p className="mt-6 text-lg text-secondary-text">
               Kasauti checks every swap of a Coinbase stock token on Base against that stock's Chainlink reference price. If your fill
-              lands outside the band you set, or the reference is frozen because markets are shut, the trade reverts onchain and your
-              money stays where it was.
+              lands outside the band you set, or the reference is frozen because markets are shut, the trade reverts onchain and nothing
+              changes hands.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild className="h-11 px-5 text-base">
