@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Hallmark, Wordmark } from "@/components/Brand";
 import { Touchstone } from "@/components/Touchstone";
@@ -38,7 +38,9 @@ function useLiveBoard() {
       clearInterval(clock);
     };
   }, []);
-  return { cfg, rows, ago: readAt ? Math.max(0, Math.round((now - readAt) / 1000)) : undefined };
+  // references older than the app's default freshness limit: markets are shut and Kasauti would refuse by default
+  const frozen = rows?.filter((r) => now / 1000 - r.updatedAt > env.defaults.maxAgeMin * 60).length;
+  return { cfg, rows, frozen, ago: readAt ? Math.max(0, Math.round((now - readAt) / 1000)) : undefined };
 }
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -46,7 +48,7 @@ const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const H2 = "font-heading text-[2rem] leading-[1.1] font-normal tracking-[-0.02em] sm:text-[2.5rem]";
 
 export function Landing() {
-  const { cfg, rows, ago } = useLiveBoard();
+  const { cfg, rows, frozen, ago } = useLiveBoard();
   const band = env.defaults.bandBps;
 
   return (
@@ -108,6 +110,16 @@ export function Landing() {
             ) : (
               <div className="aspect-[640/384] w-full rounded-2xl bg-surface-2" aria-hidden />
             )}
+            {rows && frozen ? (
+              <p className="mt-3 flex items-start gap-2 text-sm text-secondary-text">
+                <Clock size={16} aria-hidden className="mt-0.5 shrink-0 text-gold" />
+                <span>
+                  {frozen === 1 ? "One reference is" : frozen === rows.length ? `All ${frozen} references are` : `${frozen} of ${rows.length} references are`} frozen right now
+                  because U.S. markets are shut, so the pools have drifted off them. Red marks have drifted past the band. A plain swap trades into that gap;
+                  Kasauti refuses by default.
+                </span>
+              </p>
+            ) : null}
             <p className="mt-3 text-sm text-muted-foreground">
               The gold streak is each stock's Chainlink reference. A mark is where its Aero pool trades right now. Past the dashed band,
               Kasauti refuses whichever side would lose.

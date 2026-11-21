@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { Board } from "@/components/Board";
 import { TradePanel } from "@/components/TradePanel";
 import { Wordmark } from "@/components/Brand";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { WalletButton } from "@/components/WalletButton";
 import { loadConfig, readBoard, type Config, type Row } from "@/lib/touchstone";
 import type { Side } from "@/lib/verdict";
 import { env } from "@/lib/env";
@@ -29,7 +29,8 @@ export default function App() {
         setCfg(c);
         const r = await readBoard(c);
         if (!alive) return;
-        setRows(r);
+        // widest discount first, widest premium last, stocks without a pool at the end (as on the landing stone)
+        setRows(r.slice().sort((a, b) => (a.pools[0]?.gapBps ?? Infinity) - (b.pools[0]?.gapBps ?? Infinity)));
         const t = Math.floor(Date.now() / 1000);
         setNow(t);
         setReadAt(t);
@@ -50,6 +51,17 @@ export default function App() {
   }, []);
 
   const row = rows?.find((r) => r.stock.address === selected);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // On a narrow screen the panel sits under the board; bring it into view when a stock is picked.
+  const pick = (address: string) => {
+    setSelected(address);
+    const el = panelRef.current;
+    if (!el) return;
+    const { top, bottom } = el.getBoundingClientRect();
+    if (top < window.innerHeight && bottom > 0) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  };
 
   return (
     <div className="min-h-dvh bg-background">
@@ -75,7 +87,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle className="max-sm:hidden" />
-            <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
+            <WalletButton />
           </div>
         </div>
       </header>
@@ -98,13 +110,13 @@ export default function App() {
                   Base mainnet · read {readAt ? Math.max(0, now - readAt) : 0}s ago
                 </span>
               </div>
-              <Board rows={rows} now={now} side={side} bandBps={bandBps} selected={selected} onSelect={setSelected} />
+              <Board rows={rows} now={now} side={side} bandBps={bandBps} selected={selected} onSelect={pick} />
               <p className="mt-4 max-w-[72ch] text-sm text-muted-foreground">
                 Touchstone is the stock's Chainlink total-return price, multiplier included. Gap is the Aero pool price against it.{" "}
                 {cfg.unpricedTokens} of {cfg.totalTokensListed} Coinbase stock tokens have no touchstone, so Kasauti refuses to trade them.
               </p>
             </section>
-            <div className="lg:sticky lg:top-20">
+            <div ref={panelRef} className="scroll-mt-20 lg:sticky lg:top-20">
               <TradePanel cfg={cfg} row={row} now={now} side={side} setSide={setSide} bandBps={bandBps} setBandBps={setBandBps} />
             </div>
           </div>

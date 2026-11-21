@@ -243,7 +243,7 @@ export function TradePanel({
 
         <fieldset className="grid gap-2">
           <legend className="mb-2 text-sm font-medium">Refuse beyond this gap from the touchstone</legend>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             {BAND_PRESETS.map((b) => (
               <Button
                 key={b}
@@ -251,13 +251,13 @@ export function TradePanel({
                 variant="ghost"
                 onClick={() => setBandBps(b)}
                 aria-pressed={bandBps === b}
-                className={cn("num h-8 border px-3", bandBps === b ? "border-[var(--k-border-strong)] bg-surface-2 text-foreground" : "border-border text-secondary-text")}
+                className={cn("num h-8 border px-2.5 sm:px-3", bandBps === b ? "border-[var(--k-border-strong)] bg-surface-2 text-foreground" : "border-border text-secondary-text")}
               >
                 {(b / 100).toFixed(2)}%
               </Button>
             ))}
             <div className="ml-auto flex items-center gap-2">
-              <Input aria-label="Custom band in basis points" inputMode="numeric" value={bandBps} onChange={(e) => setBandBps(Math.min(10_000, Number(e.target.value.replace(/\D/g, "")) || 0))} className="num h-8 w-20 text-right" />
+              <Input aria-label="Custom band in basis points" inputMode="numeric" value={bandBps} onChange={(e) => setBandBps(Math.min(10_000, Number(e.target.value.replace(/\D/g, "")) || 0))} className="num h-8 w-16 text-right" />
               <span className="text-xs text-muted-foreground">bps</span>
             </div>
           </div>
@@ -327,7 +327,7 @@ export function TradePanel({
             <Touchstone
               variant="trade"
               title={`Expected fill ${pct(preview.verdict.gapBps)} against the touchstone; refused beyond ${pct(side === "buy" ? preview.verdict.bandBps : -preview.verdict.bandBps)}`}
-              rows={[{ key: "fill", label: stock?.symbol ?? "", gapBps: preview.verdict.gapBps, bad: refused }]}
+              rows={[{ key: "fill", label: stock?.symbol ?? "", gapBps: preview.verdict.gapBps, bad: badForSide(side, preview.verdict.gapBps, preview.verdict.bandBps) }]}
               bandBps={preview.verdict.bandBps}
               side={side}
               reference={`touchstone ${usd(row.reference)}`}
