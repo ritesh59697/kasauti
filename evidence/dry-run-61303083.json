@@ -1,0 +1,79 @@
+{
+  "amountInUsdc": 5000000,
+  "block": 61303083,
+  "chainId": 8453,
+  "kasauti": "0xDAc4c41BB3dBbCCD7d4b8724316a64DC2B56FcC8",
+  "note": "Simulated with forge script against the deployed contract on a fork of Base mainnet at this block. Nothing was broadcast.",
+  "pool": "0x532e0F46d1e528507FC9454d5847C231f23bDDf6",
+  "referenceAgeSec": 3948,
+  "referencePaused": false,
+  "referenceUsdE18": "256944500000000000000",
+  "stock": "AMZNc",
+  "stockAddress": "0xb200000000000000000000d9192b6B456483C2E8",
+  "timestamp": 1795450992,
+  "cases": [
+    {
+      "allowClosedMarket": false,
+      "amountIn": 5000000,
+      "error": "StaleTouchstone",
+      "label": "buy with the app's default policy",
+      "maxAgeSec": 3600,
+      "maxGapBps": 50,
+      "referenceAgeSec": 3948,
+      "result": "refused",
+      "side": "buy"
+    },
+    {
+      "allowClosedMarket": false,
+      "amountIn": 5000000,
+      "amountOut": 1943691,
+      "error": "",
+      "gapBps": 10,
+      "label": "buy, reference counted as fresh, app band",
+      "maxAgeSec": 7548,
+      "maxGapBps": 50,
+      "realizedUsdE18": "257205774992012619289",
+      "result": "filled",
+      "side": "buy"
+    },
+    {
+      "allowClosedMarket": false,
+      "amountIn": 971845,
+      "amountOut": 2498646,
+      "error": "",
+      "gapBps": 4,
+      "label": "sell half of it, app band",
+      "maxAgeSec": 7548,
+      "maxGapBps": 50,
+      "realizedUsdE18": "257066604601206982594",
+      "result": "filled",
+      "side": "sell"
+    },
+    {
+      "allowClosedMarket": false,
+      "amountIn": 5000000,
+      "error": "AboveTouchstone",
+      "gapBps": 10,
+      "label": "buy, zero band",
+      "maxAgeSec": 7548,
+      "maxGapBps": 0,
+      "realizedUsdE18": "257205774992012619289",
+      "referenceUsdE18": "256944500000000000000",
+      "result": "refused",
+      "side": "buy"
+    },
+    {
+      "allowClosedMarket": false,
+      "amountIn": 971846,
+      "amountOut": 2498648,
+      "error": "",
+      "gapBps": 4,
+      "label": "sell the other half, zero band",
+      "maxAgeSec": 7548,
+      "maxGapBps": 0,
+      "realizedUsdE18": "257066545851997127116",
+      "result": "filled",
+      "side": "sell"
+    }
+  ]
+}

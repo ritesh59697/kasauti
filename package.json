@@ -6,7 +6,8 @@
     "sync-config": "node --env-file=.env scripts/sync-config.mjs",
     "test:contracts": "set -a && . ./.env && set +a && cd contracts && forge test",
     "export-abi": "cd contracts && forge build && cd .. && node scripts/export-abi.mjs",
-    "deploy": "bash scripts/deploy.sh"
+    "deploy": "bash scripts/deploy.sh",
+    "evidence": "set -a && . ./.env && if [ -f web/.env ]; then . ./web/.env; else . ./web/.env.example; fi && set +a && mkdir -p evidence && cd contracts && forge script script/Evidence.s.sol:Evidence"
   },
   "dependencies": {
     "viem": "2.21.54"

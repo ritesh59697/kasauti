@@ -7,7 +7,7 @@ hardfork = "base:Cobalt"
 optimizer = true
 optimizer_runs = 200
 via_ir = true
-fs_permissions = [{ access = "read", path = "../config" }]
+fs_permissions = [{ access = "read", path = "../config" }, { access = "read", path = "../deployments" }, { access = "write", path = "../evidence" }]
 
 [rpc_endpoints]
 base = "${BASE_RPC_URL}"
