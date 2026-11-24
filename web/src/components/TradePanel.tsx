@@ -182,7 +182,10 @@ export function TradePanel({
     if (!env.kasauti || !pool || !tokenIn || !tokenOut || !amountIn || !quote.data || !account) return;
     setActionErr(undefined);
     setTradeHash(undefined);
-    const minOut = (quote.data * BigInt(10_000 - Math.min(bandBps, 10_000))) / 10_000n;
+    // A forced send exists to record the touchstone refusal, so it sets no slippage floor: otherwise any
+    // tick against the quote reverts with Slippage first and hides the refusal. The touchstone check
+    // still bounds the price, so a forced send can only fill inside the band.
+    const minOut = force ? 0n : (quote.data * BigInt(10_000 - Math.min(bandBps, 10_000))) / 10_000n;
     const args = [pool.address, tokenIn, tokenOut, amountIn, minOut, policy] as const;
     try {
       let gas: bigint | undefined;

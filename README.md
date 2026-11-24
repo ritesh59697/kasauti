@@ -18,6 +18,7 @@ Built for **Base Stocks Maxxing Season**, *Programmable Stock Markets* track.
 | **Deploy tx** | [`0x86ea9208…`](https://base.blockscout.com/tx/0x86ea9208cfa8eaf5f4b426e830934b958db2189300f1a98589cb9a6a6c4cfc84), block 58058089 |
 | **Tests** | 15 tests on a Base mainnet fork, against the real stock tokens, feeds and pools ([how to run](#run-the-tests)) |
 | **Mainnet-state run** | The deployed contract, run against Base mainnet at block 61303083 with no money moved: the app's default policy refused a buy on a stale reference (`StaleTouchstone`), a buy and a sell filled inside the 0.50% band, and a zero-band buy was refused (`AboveTouchstone`, +0.10%). Saved in [`evidence/dry-run-61303083.json`](evidence/dry-run-61303083.json); rerun with `npm run evidence` |
+| **Mainnet trades** | Two real fills and one real onchain refusal (`BelowTouchstone`, −0.66%), sent from the app ([details](#mainnet-trades)) |
 | **Video** | *link added at submission* |
 
 **What to look at, in two minutes**
@@ -44,7 +45,15 @@ Every test runs on a fork of Base mainnet against the real stock tokens, Chainli
 
 ### Mainnet trades
 
-*None yet.* A guarded fill and a recorded onchain refusal will be listed here with their transaction links.
+Real trades through the deployed contract, sent from the app with an ordinary browser wallet:
+
+| When (UTC) | Trade | Policy | Result | Tx |
+|---|---|---|---|---|
+| 23 Nov 2026, 16:43 | Buy $1 of AMZNc | 0.50% band | **Filled** at $255.42 against a $255.42 reference (gap 0.00%) | [`0xcf8c6074…`](https://base.blockscout.com/tx/0xcf8c6074a2cc40fd7ce31329a7b21c4b83f16e079b9b34610a5df3efe47bb8dc) |
+| 23 Nov 2026, 16:44 | Buy $1 of NVDAc | 0.50% band | **Filled** at $164.09 against a $163.88 reference (+0.12%) | [`0xc51381c2…`](https://base.blockscout.com/tx/0xc51381c20acc0161c6111b105861ffc19ead35cc1da28b8342cb9938843e1d86) |
+| 24 Nov 2026, 01:49 | Sell 0.00649 NVDAc | 0.00% band | **Refused** with `BelowTouchstone`: the sale would have paid $165.32 against a $166.43 reference (−0.66%), so the whole transaction reverted and the NVDAc never left the wallet | [`0xa656b9c8…`](https://base.blockscout.com/tx/0xa656b9c851a324dd4be2870bb97ccf184c28fb6e873e5e005ee3c5aefed3a0bf) |
+
+For the fills, the realized price, reference and gap come from each transaction's `GuardedSwap` event. For the refusal, they come from the revert data, `BelowTouchstone(gapBps, receivedE18, referenceE18)`. Replay it with `cast run 0xa656b9c851a324dd4be2870bb97ccf184c28fb6e873e5e005ee3c5aefed3a0bf --rpc-url <Base RPC>`.
 
 ## The problem
 
