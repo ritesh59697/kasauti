@@ -500,7 +500,7 @@ function Receipt({ hash, args, row, side }: { hash: Hash; args?: readonly unknow
         </>
       )}
       <a className="inline-flex items-center gap-1.5 justify-self-start rounded-sm text-muted-foreground underline-offset-2 hover:underline" href={link} target="_blank" rel="noreferrer">
-        View on Basescan <ExternalLink size={14} aria-hidden />
+        View on {new URL(env.explorer).hostname} <ExternalLink size={14} aria-hidden />
       </a>
     </div>
   );
