@@ -421,7 +421,14 @@ function stampText(v: Verdict): string {
 }
 
 function Receipt({ hash, args, row, side }: { hash: Hash; args?: readonly unknown[]; row: Row; side: Side }) {
-  const rcpt = useWaitForTransactionReceipt({ hash });
+  // Not wagmi's useWaitForTransactionReceipt: it throws on a reverted transaction, so a refusal would never
+  // render. viem's waitForTransactionReceipt returns the receipt with status "reverted" instead.
+  const rcpt = useQuery({
+    queryKey: ["receipt", hash],
+    queryFn: () => client.waitForTransactionReceipt({ hash }),
+    staleTime: Infinity,
+    retry: 3,
+  });
   const { address: account } = useAccount();
 
   const reason = useQuery({
@@ -478,6 +485,7 @@ function Receipt({ hash, args, row, side }: { hash: Hash; args?: readonly unknow
   const link = `${env.explorer}/tx/${hash}`;
   return (
     <div className="grid gap-3 rounded-xl border border-border p-4 text-sm" aria-live="polite">
+      {rcpt.isError && <p className="text-muted-foreground">Couldn't read the receipt: {shortErr(rcpt.error)}</p>}
       {rcpt.isLoading && (
         <p className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="animate-spin" size={16} aria-hidden /> Waiting for Base…
