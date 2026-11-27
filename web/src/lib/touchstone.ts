@@ -6,6 +6,8 @@ export type Pool = { address: Address; factory: Address; tickSpacing: number; fe
 export type StockCfg = {
   symbol: string;
   name: string;
+  /** Company logo from Coinbase's Tokenized Stocks API; null when it has none */
+  iconUrl?: string | null;
   address: Address;
   decimals: number;
   multiplier: number;

@@ -1,5 +1,5 @@
 // Builds config/base.json from live sources. Nothing here is a hand-typed address:
-// - stock tokens, decimals, multipliers: Coinbase Tokenized Stocks API
+// - stock tokens, decimals, multipliers, icons: Coinbase Tokenized Stocks API
 // - price feeds + heartbeats: Chainlink's public feed directory for Base
 // - pool factory allowlist: Aero's own deployment file (dromos-labs)
 // - candidate pools: DexScreener, then every pool is verified onchain against the allowlisted factory
@@ -116,7 +116,7 @@ async function main() {
     pools.sort((a, b) => b.liquidityUsd - a.liquidityUsd);
 
     stocks.push({
-      symbol: t.symbol, name: t.name, address, decimals: Number(decimals),
+      symbol: t.symbol, name: t.name, iconUrl: t.icon_url ?? null, address, decimals: Number(decimals),
       multiplier: Number(multiplierWad) / 1e18, paused,
       feed: { address: feedAddr, description: feedDesc, decimals: Number(feedDecimals), heartbeat: feed.heartbeat },
       pools,

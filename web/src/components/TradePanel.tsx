@@ -27,6 +27,7 @@ import { badForSide, judge, pct, usd, type Policy, type Side, type Verdict } fro
 import { kasautiAbi } from "@/lib/kasautiAbi";
 import { env } from "@/lib/env";
 import { cn } from "@/lib/utils";
+import { StockIcon } from "./StockIcon";
 
 const BAND_PRESETS = [25, 50, 100];
 
@@ -214,11 +215,14 @@ export function TradePanel({
   return (
     <section aria-labelledby="trade-h" className="rounded-2xl border border-border bg-card shadow-[var(--k-card-shadow)]">
       <div className="flex items-center justify-between gap-3 p-5">
-        <div className="grid">
-          <h2 id="trade-h" className="text-lg font-medium">
-            {stock ? stock.symbol : "Pick a stock"}
-          </h2>
-          {stock && <span className="text-xs text-muted-foreground">{stock.name.replace(/ \(.*\)$/, "")}</span>}
+        <div className="flex items-center gap-3">
+          {stock && <StockIcon stock={stock} size={36} />}
+          <div className="grid">
+            <h2 id="trade-h" className="text-lg font-medium">
+              {stock ? stock.symbol : "Pick a stock"}
+            </h2>
+            {stock && <span className="text-xs text-muted-foreground">{stock.name.replace(/ \(.*\)$/, "")}</span>}
+          </div>
         </div>
         <Tabs value={side} onValueChange={(v) => setSide(v as Side)}>
           <TabsList>

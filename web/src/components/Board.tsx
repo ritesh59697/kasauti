@@ -2,6 +2,7 @@ import { PauseCircle } from "lucide-react";
 import { ageLabel, type Row } from "@/lib/touchstone";
 import { badForSide, pct, usd, type Side } from "@/lib/verdict";
 import { cn } from "@/lib/utils";
+import { StockIcon } from "./StockIcon";
 
 export function Board({
   rows,
@@ -53,10 +54,13 @@ export function Board({
                       onSelect(r.stock.address);
                     }}
                     aria-pressed={isSel}
-                    className="grid rounded-sm text-left"
+                    className="flex items-center gap-3 rounded-sm text-left"
                   >
-                    <span className="font-medium">{r.stock.symbol}</span>
-                    <span className="text-xs text-muted-foreground">{r.stock.name.replace(/ \(.*\)$/, "")}</span>
+                    <StockIcon stock={r.stock} size={28} />
+                    <span className="grid">
+                      <span className="font-medium">{r.stock.symbol}</span>
+                      <span className="text-xs text-muted-foreground">{r.stock.name.replace(/ \(.*\)$/, "")}</span>
+                    </span>
                   </button>
                 </td>
                 <td className="num px-3 text-right">
