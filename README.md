@@ -19,7 +19,7 @@ Built for **Base Stocks Maxxing Season**, *Programmable Stock Markets* track.
 | **Tests** | 15 tests on a Base mainnet fork, against the real stock tokens, feeds and pools ([how to run](#run-the-tests)) |
 | **Mainnet-state run** | The deployed contract, run against Base mainnet at block 61303083 with no money moved: the app's default policy refused a buy on a stale reference (`StaleTouchstone`), a buy and a sell filled inside the 0.50% band, and a zero-band buy was refused (`AboveTouchstone`, +0.10%). Saved in [`evidence/dry-run-61303083.json`](evidence/dry-run-61303083.json); rerun with `npm run evidence` |
 | **Mainnet trades** | Three real fills (two buys, one sell) and two real onchain refusals (`BelowTouchstone`), sent from the app ([details](#mainnet-trades)) |
-| **Video** | *link added at submission* |
+| **Video** | [Demo on YouTube](https://youtu.be/G7CRP3R97Y0) (1:48) · [X post](https://x.com/Ritesh5969/status/2126533410105827371) |
 
 **What to look at, in two minutes**
 1. Open the app. The board reads every priced stock token live: Chainlink reference, its age, Coinbase's pause flag, the Aero pool price and the gap between them.
